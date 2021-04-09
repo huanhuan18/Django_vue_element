@@ -1,10 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的第一个页面</title>
+  <link rel="stylesheet" href="/static/css/mystyle.css">
 </head>
+
 <body>
-<h1>第一个测试</h1>
+  <div id="home">
+      <div class="header">
+        <h1>
+          {{ siteinfo.title }}
+        </h1>
+        <img src="/upload/{{ siteinfo.logo }}" alt="">
+      </div>
+
+      <hr />
+      <div class="content">
+          <div class="menu">
+              {% for class in classes %}
+              <div class="item">
+                  <span>{{ class.text }}</span>
+              </div>
+              {% endfor %}
+          </div>
+          <div class="userlist">
+              全部用户
+              <hr>
+               {% if userlist %}
+                  {% for user in userlist %}
+                  <div class="user">
+                     <img src="/static/admin.jpg" alt="">
+                      <p>{{ user.nickName }}</p>
+                  </div>
+                  {% endfor %}
+               {% else %}
+                <p>没有用户</p>
+               {% endif %}
+
+          </div>
+      </div>
+      <hr>
+      <div class="foot">
+          Copyright gf
+      </div>
+  </div>
+
 </body>
+
 </html>

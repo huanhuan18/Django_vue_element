@@ -129,5 +129,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/upload/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'upload').replace('\\', '/')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'upload').replace('\\', '/')   # Django2的写法
+MEDIA_ROOT = BASE_DIR / 'upload'  # Django3的写法
 

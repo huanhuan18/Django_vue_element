@@ -14,7 +14,7 @@
 	3>TEMPLATES: 模板配置，在app项目下新建templates文件夹，然后在DIRS里配置os.path.join(BASE_DIR, 'templates').replace('\\', '/')
 	4>STATIC_URL: 静态文件
 	5>MIDEA_URL: 媒体目录的路由，自己添加，一般是用户上传图片文件等，配置为MEDIA_URL = '/upload/'
-	6>MIDEA_ROOT: 媒体目录 MEDIA_ROOT = os.path.join(BASE_DIR, 'upload').replace('\\', '/')，然后在项目下新建upload和在app项目下新建static文件夹，在urls.py中写入
+	6>MIDEA_ROOT: 媒体目录 MEDIA_ROOT = BASE_DIR / 'upload'，然后在项目下新建upload和在app项目下新建static文件夹，在urls.py中写入
 		from django.conf import settings
 		from django.conf.urls.static import static
 		urlpatterns = [path('admin', admin.site.urls),]
@@ -68,3 +68,34 @@
 	4>在settings.py中把sqlite3数据库注释，将mysql改为default
 	5>后台重新创建超级管理员进入Siteinfo添加一条信息，即可在数据库中看到
 	6>如果想将已有的数据迁移，不需要Django来完成，就要去了解sql文件的转换
+### 15.从views视图层读取数据到HTML模板（传统的MTV模式，基本都要后端去完成，后续不会用这种方式，而是用前后端分离代替）
+	1>在views.py中导入表
+	from myblog.models import Siteinfo
+	def index(request):
+		siteinfo = Siteinfo.objects.all()[0] // 获取Siteinfo下的第一条数据并赋值给一个变量
+		print(siteinfo.title)
+		print(siteinfo.logo)
+		data = {
+        "siteinfo": siteinfo
+		}
+		return render(request, 'index.html', data)  //将数据装载成字典，传给html
+	2>在index.html中用{{siteinfo.title}}获取数据
+### 16.手写HTML样式
+	样式保存在static/css/mystyle.css样式内
+### 17.制作两张表，然后注册到admin中可视化，添加数据
+	1>课程分类Classes
+	2>用户Userinfo  
+	//课程是1，用户是多，所以用户中用外键，belong=models.ForeignKey(Classes, on_delete=models.SET_NULL, related_name="userinfo_classes", null=True, blank=True)
+	//on_delete是当删除上级的Classes表时，当前表的field行为,related_name是查询时的展现形式，写成字符串，个人习惯多的在前，少的在后
+### 18.Django模板的for循环、if条件
+	//如果有用户，把用户循环装载进来，否则显示没有用户
+	{% if userlist %}
+	  {% for user in userlist %}
+		<div class="user">
+			<img src="/static/admin.jpg" alt="">
+			<p>{{ user.nickName }}</p>
+		</div>
+	  {% endfor %}
+    {% else %}
+		<p>没有用户</p>
+    {% endif %}

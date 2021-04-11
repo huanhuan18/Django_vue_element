@@ -99,3 +99,86 @@
     {% else %}
 		<p>没有用户</p>
     {% endif %}
+### 19.Django的模板继承
+	在index.html中使用a标签连接了/classes
+	1>新建一个classes.html中写入{% extends "index.html" %}   这样就继承了index.html模板
+	2>在views.py中新建函数classes，获取数据并发送给classes.html
+### 20.路由传参
+	在index.html中的a标签herf写上<a href="/classes/?id={{ class.id }}">
+	在views.py中classes函数内写入choosed_id = request.GET['id']鼠标悬浮即可看到每一个标签对应的id
+### 21.认识json与错误处理
+	在views.py中导入from django.http import HttpResponse, JsonResponse     from django.shortcuts import redirect
+	1>return HttpResponse('<h1>无结果</h1>')  //发送字符串
+	2>return JsonResponse(data)  //发送json形式
+	3>return redirect('/')  //重定向到首页
+	try:
+		choosed_id = request.GET['id']
+		print(choosed_id)
+		choosed = Classes.objects.filter(id=choosed_id)
+    except:
+        return redirect("/")
+
+    if choosed:
+        userlist = Userinfo.objects.filter(belong=choosed[0]) //因为filter获取的一定是列表，所以加位标
+    else:
+        userlist = []
+### 22.安装django-rest-framework（api视图）
+	前后端分离好处：				  		能够让用户在整个交互过程中，不会让用户一直等待，即便后端数据没有过来，至少用户打开了页面，如果说后端发生错误，例如用户对api接口触发了一些奇怪的错误，我们可以通过这次访问单纯的抛出成功或者不成功两种选项让用户去选，前后端分离能够让我们在开发和维护的过程中更方便
+	1>pip install djangorestframework
+	2>'rest_framework' 放到INSTALLED_APPS中
+	3>在myblog中新建api.py,在这里面写入一些视图函数
+		from rest_framework.decorators import api_view
+		from rest_framework.response import Response
+		@api_view(['GET', 'POST'])
+		def api_test(request):
+			if request.method == "POST":
+				return Response('post')
+			return Response('ok')
+	4>在urls.py中写入路由path('api/', api.api_test)
+### 23.数据的序列化
+	1>在myblog中新建toJson.py,在这里面写入一些序列化的东西
+		from rest_framework import serializers
+		from myblog.models import Classes
+
+		class Classes_data(serializers.ModelSerializer):
+			class Meta:
+				depth = 1
+				model = Classes
+				fields = '__all__'
+	2>在api.py中写视图函数
+		@api_view(['GET', 'POST'])
+		def api_test(request):
+			classes = Classes.objects.all()
+			classes_data = Classes_data(classes, many=True)
+			userlist = Userinfo.objects.all()
+			userlist_data = Userinfo_data(userlist, many=True)   //有多条数据的时候一定要加many=True,否则会报错
+
+			data = {
+				'classes': classes_data.data,
+				'userlist': userlist_data.data
+			}
+			return Response({'data':data})
+### 24.python字典的数据整理
+	因为23中的数据有重复，所以一般用手写数据
+	@api_view(['GET', 'POST'])
+	def api_test(request):
+		classes = Classes.objects.all()
+		data = {
+			'classes':[]
+		}
+		for c in classes:
+			data_item = {
+				'id': c.id,
+				'text': c.text,
+				'userlist': []
+			}
+			userlist = c.userinfo_classes.all()   //在models.py中写的related_name，反向查询
+			for user in userlist:
+				user_data = {
+					'id': user.id,
+					'nickName': user.nickName,
+					'headImg': str(user.headImg)   //图片路径转成字符串
+				}
+				data_item['userlist'].append(user_data)
+			data['classes'].append(data_item)
+		return Response({'data':data})

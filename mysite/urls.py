@@ -18,10 +18,14 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from myblog import views
+from myblog import views, api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('index/', views.index)
+    path('index/', views.index),
+    path('classes/', views.classes),
+
+    # api接口
+    path('api/', api.api_test)
 ] + static(settings.STATIC_URL,document_root=settings.STATIC_ROOT) \
         + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

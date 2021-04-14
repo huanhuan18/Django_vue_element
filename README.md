@@ -182,7 +182,7 @@
 				data_item['userlist'].append(user_data)
 			data['classes'].append(data_item)
 		return Response({'data':data})
-###认识Ajax与Vue
+### 认识Ajax与Vue
 	1>在head标签内添加js
 	<script src="/static/js/vue.js"></script>
     <script src="/static/js/axios.js"></script>
@@ -220,6 +220,7 @@
 	<div v-if="item.id==choosed" v-for="item in classes" class="item" style="background:#777777;color: #ffffff">
 	<div v-if="item.userlist.length>0" v-for="user in item.userlist" class="user">
 	<div v-on:click="chooseClass(item.id)" v-else class="item">
-###前后端分离好处：		
+### 前后端分离好处：		
 能够让用户在整个交互过程中，不会让用户一直等待，即便后端数据没有过来，至少用户打开了页面，如果说后端发生错误，例如用户对api接口触发了一些奇怪的错误，我们可以通过这次访问单纯的抛出成功或者不成功两种选项让用户去选，前后端分离能够让我们在开发和维护的过程中更方便
+
 	后端所要做的就是将数据整理成最简洁的方式通过api的接口发送到前端，前端所需要做的就是一次性把这些数据全部接收，如getData函数通过ajax把数据全部拿过来，至于页面中的交互逻辑应该是交给vue.js去管理视图交互

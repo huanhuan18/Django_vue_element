@@ -2,52 +2,82 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我的第一个页面</title>
-  <link rel="stylesheet" href="/static/css/mystyle.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的第一个页面</title>
+    <link rel="stylesheet" href="/static/css/mystyle.css">
+    <script src="/static/js/vue.js"></script>
+    <script src="/static/js/axios.js"></script>
 </head>
 
 <body>
-  <div id="home">
-      <div class="header">
+<div id="home">
+    <div class="header">
         <h1>
-          {{ siteinfo.title }}
+            {{ siteinfo.title }}
         </h1>
         <img src="/upload/{{ siteinfo.logo }}" alt="">
-      </div>
+    </div>
 
-      <hr />
-      <div class="content">
-          <div class="menu">
-              {% for class in classes %}
-              <div class="item">
-{#                  <span>{{ class.text }}</span>#}
-                  <a href="/classes/?id={{ class.id }}">{{ class.text }}</a>
-              </div>
-              {% endfor %}
-          </div>
-          <div class="userlist">
-              全部用户
-              <hr>
-               {% if userlist %}
-                  {% for user in userlist %}
-                  <div class="user">
-                     <img src="/static/admin.jpg" alt="">
-                      <p>{{ user.nickName }}</p>
-                  </div>
-                  {% endfor %}
-               {% else %}
-                <p>没有用户</p>
-               {% endif %}
+    <hr/>
+    <div class="content">
+        <div class="menu">
+            <div v-if="item.id==choosed" v-for="item in classes" class="item" style="background:#777777;color: #ffffff">
+{#                如果当前的id等于选择的加一个style样式#}
+                <a>[[item.text]]</a>
+            </div>
+            <div v-on:click="chooseClass(item.id)" v-else class="item">
+{#                在未选中的class标签上加点击事件#}
+                <a>[[item.text]]</a>
+            </div>
+        </div>
+        <div v-if="item.id==choosed" v-for="item in classes" class="userlist">
+            <p>[[item.text]]</p>
+            <hr>
 
-          </div>
-      </div>
-      <hr>
-      <div class="foot">
-          Copyright gf
-      </div>
-  </div>
+            <div v-if="item.userlist.length>0" v-for="user in item.userlist" class="user">
+                <img src="/static/admin.jpg" alt="">
+                <p>[[user.nickName]]</p>
+            </div>
+            <p v-else>没有用户</p>
+
+        </div>
+    </div>
+    <hr>
+    <div class="foot">
+        Copyright gf
+    </div>
+</div>
+
+<script>
+    new Vue({
+        delimiters: ['[[',']]'] ,   //修改默认双大括号渲染数据为双中括号
+        el: '#home',
+        data: {
+            choosed:1,    //打开页面默认选择的是id为1
+            classes:[]
+        },
+        mounted() {
+            this.getData()
+        },
+        methods: {
+          getData(){
+              axios({
+                  url:'/api',
+                  type:'json',
+                  method:'get'
+              }).then((res)=>{
+                  console.log(res.data.data.classes)
+                  this.classes = res.data.data.classes
+                  }
+              )},
+            chooseClass(id){
+              console.log(id)
+                this.choosed=id
+            }
+        },
+    })
+</script>
 
 </body>
 

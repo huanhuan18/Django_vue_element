@@ -12,68 +12,81 @@
 
 <body>
 <div id="home">
-    <div class="header">
-        <h1>
-            {{ siteinfo.title }}
-        </h1>
-        <img src="/upload/{{ siteinfo.logo }}" alt="">
-    </div>
+    <div v-show="onOff">
+        <div class="header">
+            <h1>
+                {{ siteinfo.title }}
+            </h1>
+            <img src="/upload/{{ siteinfo.logo }}" alt="">
+        </div>
 
-    <hr/>
-    <div class="content">
-        <div class="menu">
-            <div v-if="item.id==choosed" v-for="item in classes" class="item" style="background:#777777;color: #ffffff">
-{#                如果当前的id等于选择的加一个style样式#}
-                <a>[[item.text]]</a>
+        <hr/>
+        <div class="content">
+            <div class="menu">
+                <div v-if="item.id==choosed" v-for="item in classes" class="item"
+                     style="background:#777777;color: #ffffff">
+                    {#                如果当前的id等于选择的加一个style样式#}
+                    <a>[[item.text]]</a>
+                </div>
+                <div v-on:click="chooseClass(item.id)" v-else class="item">
+                    {#                在未选中的class标签上加点击事件#}
+                    <a>[[item.text]]</a>
+                </div>
             </div>
-            <div v-on:click="chooseClass(item.id)" v-else class="item">
-{#                在未选中的class标签上加点击事件#}
-                <a>[[item.text]]</a>
+            <div v-if="item.id==choosed" v-for="item in classes" class="userlist">
+                <p>[[item.text]]</p>
+                <hr>
+
+                <div v-if="item.userlist.length>0" v-for="user in item.userlist" class="user">
+                    <img src="/static/admin.jpg" alt="">
+                    <p>[[user.nickName]]</p>
+                </div>
+                <p v-else>没有用户</p>
+
             </div>
         </div>
-        <div v-if="item.id==choosed" v-for="item in classes" class="userlist">
-            <p>[[item.text]]</p>
-            <hr>
-
-            <div v-if="item.userlist.length>0" v-for="user in item.userlist" class="user">
-                <img src="/static/admin.jpg" alt="">
-                <p>[[user.nickName]]</p>
-            </div>
-            <p v-else>没有用户</p>
-
-        </div>
+        <hr>
     </div>
-    <hr>
+
+    <input v-model="inputText" type="text" name="" id="" style="height: 30px;width: 700px">
+    <p>[[inputText]]</p>
     <div class="foot">
         Copyright gf
+        <button @click="onOffClick">开关</button>
     </div>
 </div>
 
 <script>
     new Vue({
-        delimiters: ['[[',']]'] ,   //修改默认双大括号渲染数据为双中括号
+        delimiters: ['[[', ']]'],   //修改默认双大括号渲染数据为双中括号
         el: '#home',
         data: {
-            choosed:1,    //打开页面默认选择的是id为1
-            classes:[]
+            inputText: '',
+            choosed: 1,    //打开页面默认选择的是id为1
+            classes: [],
+            onOff: true,
         },
         mounted() {
             this.getData()
         },
         methods: {
-          getData(){
-              axios({
-                  url:'/api',
-                  type:'json',
-                  method:'get'
-              }).then((res)=>{
-                  console.log(res.data.data.classes)
-                  this.classes = res.data.data.classes
-                  }
-              )},
-            chooseClass(id){
-              console.log(id)
-                this.choosed=id
+            onOffClick() {
+                this.onOff = !this.onOff
+            },
+            getData() {
+                axios({
+                    url: '/api',
+                    type: 'json',
+                    method: 'get'
+                }).then((res) => {
+                        console.log(res.data.data.classes)
+                        this.classes = res.data.data.classes
+                    }
+                )
+            },
+            chooseClass(id) {
+                console.log(id)
+                this.choosed = id
             }
         },
     })

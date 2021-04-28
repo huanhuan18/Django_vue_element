@@ -34,3 +34,37 @@ def api_test(request):
             data_item['userlist'].append(user_data)
         data['classes'].append(data_item)
     return Response({'data':data})
+
+@api_view(['GET'])
+def getMenuList(request):
+    allClasses = Classes.objects.all()
+
+    # 整理数据为json
+    data = []
+    for c in allClasses:
+        # 设计单挑数据结构
+        data_item = {
+            'id':c.id,
+            'text':c.text
+        }
+        data.append(data_item)
+    return Response(data)
+
+@api_view(['GET'])
+def getUserList(request):
+    menuId = request.GET['id']
+    print(menuId)
+    menu = Classes.objects.get(id=menuId)
+    print(menu)
+    userlist = Userinfo.objects.filter(belong=menu)
+    print(userlist)
+    # 开始整理数据列表
+    data = []
+    for user in userlist:
+        data_item = {
+            'id':user.id,
+            'headImg':str(user.headImg),
+            'nickName':user.nickName
+        }
+        data.append(data_item)
+    return Response(data)

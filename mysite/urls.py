@@ -26,6 +26,8 @@ urlpatterns = [
     path('classes/', views.classes),
 
     # api接口
-    path('api/', api.api_test)
+    path('api/', api.api_test),
+    path('get-menu-list/', api.getMenuList),
+    path('get-user-list/', api.getUserList)
 ] + static(settings.STATIC_URL,document_root=settings.STATIC_ROOT) \
         + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -182,7 +182,7 @@
 				data_item['userlist'].append(user_data)
 			data['classes'].append(data_item)
 		return Response({'data':data})
-### 认识Ajax与Vue
+### 25.认识Ajax与Vue
 	1>在head标签内添加js
 	<script src="/static/js/vue.js"></script>
     <script src="/static/js/axios.js"></script>
@@ -220,7 +220,336 @@
 	<div v-if="item.id==choosed" v-for="item in classes" class="item" style="background:#777777;color: #ffffff">
 	<div v-if="item.userlist.length>0" v-for="user in item.userlist" class="user">
 	<div v-on:click="chooseClass(item.id)" v-else class="item">
-### 前后端分离好处：		
-能够让用户在整个交互过程中，不会让用户一直等待，即便后端数据没有过来，至少用户打开了页面，如果说后端发生错误，例如用户对api接口触发了一些奇怪的错误，我们可以通过这次访问单纯的抛出成功或者不成功两种选项让用户去选，前后端分离能够让我们在开发和维护的过程中更方便
+### 前后端分离好处：
+	1>	能够让用户在整个交互过程中，不会让用户一直等待，即便后端数据没有过来，至少用户打开了页面，如果说后端发生错误，例如用户对api接口触发了一些奇怪的错误，我们可以通过这次访问单纯的抛出成功或者不成功两种选项让用户去选，前后端分离能够让我们在开发和维护的过程中更方便
 
-	后端所要做的就是将数据整理成最简洁的方式通过api的接口发送到前端，前端所需要做的就是一次性把这些数据全部接收，如getData函数通过ajax把数据全部拿过来，至于页面中的交互逻辑应该是交给vue.js去管理视图交互
+	2>后端所要做的就是将数据整理成最简洁的方式通过api的接口发送到前端，前端所需要做的就是一次性把这些数据全部接收，如getData函数通过ajax把数据全部拿过来，至于页面中的交互逻辑应该是交给vue.js去管理视图交互
+### 26.vuejs数据绑定的方法
+	1.第一种绑定：
+	<div v-if="onOff">    //v-if和v-show是一样的效果，但是后者可以在dom上看到开发者写的标签
+	<button @click="onOffClick">开关</button>   //按钮控制上方的标签展示
+	data: {
+            onOff: true
+        },
+	methods: {
+            onOffClick() {
+                this.onOff = !this.onOff  //每次点击将onOff的值取反
+            },
+		}
+	2.第二种绑定（动态输入）：
+	<input v-model="inputText" type="text" name="" id="" style="height: 30px;width: 700px">
+    <p>[[inputText]]</p>
+	data: {
+            inputText: '',
+		}
+### 27.安装NodeJS环境
+	后端环境，可以让JavaScript彻底运行在计算机环境内
+	node-v12.8.1
+### 28.安装VueCli脚手架
+	VueJS官网->生态系统->vuecli
+	npm install -g @vue/cli    //如果安装较慢，可以淘宝搜索cnpm用淘宝镜像安装
+### 29.VueCli项目的创建
+	1>终端输入vue ui
+	2>选择目录创建项目，选择预设默认vue2
+	3>点击任务->serve->运行
+### 30.VueUI管理项目插件
+	1>添加vue-router   //路由
+### 31.组件基础概念
+	每一个.vue文件就是一个组件，下面是单独的一个html文件测试组件
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Document</title>
+		<script src="vue.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<!-- <h1>当前开发状态：{{msg}}</h1> -->
+			<gf-test></gf-test>
+			<gf-test></gf-test>
+			<gf-test></gf-test>
+			<gf-test></gf-test>
+		</div>
+
+	<script>
+		// 这个html主要为测试component组件的作用，下面定义的这个组件可以在body中当成一个个标签来使用
+		Vue.component('gf-test',{
+			data(){
+				return{
+					msg:"开发完毕"
+				}
+			},
+			template:"<h1>当前开发状态：{{msg}}</h1>",
+		})
+		
+		new Vue({
+			el:"#app",
+			// data:{
+				// msg:"开发完毕"
+			// },
+			// template:"<h1>当前开发状态：{{msg}}</h1>",
+			// methods:{
+
+			// }
+		})
+	</script>
+
+	</body>
+	</html>
+### 32.第一个视图组件（一个组件内只能有一个总的div）
+	1>把之前在后端写的static下的css和图片资源复制到前端的src下的assets里
+	2>在main.js里导入mystyle.css   //import '../src/assets/css/mystyle.css'
+	3>因为mystyle.css写的样式id都是home，所以到App.vue把id=app改成home
+	4>把Home.vue里的HelloWord组件删掉,将后端的index.html里的home div下的所有内容复制到Home.vue里整理格式
+	5>把App.vue里的nav标签的路由和style里的样式删掉
+### 33.为各组件分配路由
+	1>把Home.vue里的内容剪切到App.vue里
+	2>把<router-view/>放到userlist标签内，因为这里面是要切换的地方
+	3>在views里新建django.vue
+	4>在index.js里设置要展示的路由
+	5>在App.vue内添加路由指向标签   //<router-link to="/" style="color:#fff">Django框架</router-link>
+	6>继续添加其他的路由组件，重复4和5（手动写，很麻烦，下一节通过ajax请求实现数据绑定）
+### 34.认识webpack,安装axios
+	1>仪表盘->依赖->开发依赖->输入axios安装
+	tips:vuecli的开发使用的是nodeJS下webpack管理方式，通过package.json来告知我们当前整个项目运行在nodeJs环境下需要的是哪些东西
+	2>在django.vue里写入一次axios请求（用的是别人的数据）
+		<div v-for="item in imglist" :key="item.pk" class="user">  //每次for循环必须绑定一个key
+			<img :src="'https://api.dweb.club/'+item.pic" alt="">
+			<p>{{item.title}}</p>
+		</div>
+		
+		<script>
+		import axios from 'axios'
+		export default {
+			data() {
+				return{
+					imglist:[]
+				}
+			},
+			//用户在看到页面之前，最后Vue提供的一次函数操作
+			mounted(){
+				this.getData()
+			},
+			methods:{
+				getData() {
+					axios({
+						url:'https://api.dweb.club/dweb-api/get-index-data/',
+						type:'json',
+						method:'get'
+					}).then((res)=>{
+						console.log(res)
+						this.imglist=res.data.newsdata
+					})
+				}
+			}
+		}
+		</script>
+	3>启动后端python manage.py runserver 127.0.0.1:9000  (用我们自己的数据，因为8000端口被占用了，所以用9000端口)
+	4>把url改成http://127.0.0.1:9000/api/
+	5>刷新页面会看到CORS报错
+### 35.理解cors跨源请求
+	两个网站之间的请求，也叫跨域请求，用户访问A网站，但是A网站想用B网站的数据，这时就要在B网站设置一个corsheaders,这样B才能返回一个json数据给A
+### 36.django-cors-headers的安装与配置
+	1>pip install django-cors-headers
+	2>将corsheaders挂载到INSTALL_APP里（放在我们的app上方）
+	3>添加中间件(一定要通用组件的上方)
+		MIDDLEWARE = [
+			'corsheaders.middleware.CorsMiddleware',
+			'django.middleware.common.CommonMiddleware',
+			]
+	4>配置CorsHeaders
+		#跨域增加忽略
+		CORS_ALLOW_CREDENTILS = True
+		CORS_ORIGIN_ALLOW_ALL = True
+		CORS_ORIGIN_WHITELIST = (
+			'http://127.0.0.1',
+		)
+		CORS_ALLOW_METHODS = (
+			'DELETE',
+			'GET',
+			'OPTIONS',
+			'PATCH',
+			'POST',
+			'PUT',
+			'VIEW',
+		)
+		CORS_ALLOW_HEADERS = ( 
+			'XMLHttpRequest', 
+			'X_FILENAME', 
+			'accept-encoding', 
+			'authorization', 
+			'content-type', 
+			'dnt', 
+			'origin', 
+			'user-agent', 
+			'x-csrftoken', 
+			'x-requested-with', 
+			'Pragma'
+		)
+	5>刷新http://localhost:8080/#/即可看到成功访问到了后端的9000端口api下的数据，至此配置好了后端cors头的设置
+### 37.VueCli中的v-for与v-if
+	1>在App.vue中写入
+	<script>
+	import axios from "axios";
+	export default {
+	  data() {
+		return {
+		  choosed: 1,
+		  menuList: [],
+		};
+	  },
+	  mounted() {
+		this.getMenuList();
+	  },
+	  methods: {
+		//获取分类列表
+		getMenuList() {
+		  console.log("开始获取分类");
+		  axios({
+			url: "http://127.0.0.1:9000/get-menu-list/",
+			type: "json",
+			method: "get",
+		  }).then((res) => {
+			console.log(res);
+			this.menuList = res.data;
+		  });
+		},
+		chooseMenu(id) {
+		  console.log(id);
+		  this.choosed = id;
+		},
+	  },
+	};
+	</script>
+	2>在后端urls.py中写入新的路由  path('get-menu-list/', api.getMenuList)
+	3>在api.py中写入
+		@api_view(['GET'])
+		def getMenuList(request):
+			allClasses = Classes.objects.all()
+
+			//整理数据为json
+			data = []
+			for c in allClasses:
+				//设计单挑数据结构
+				data_item = {
+					'id':c.id,
+					'text':c.text
+				}
+				data.append(data_item)
+			return Response(data)
+	4>接下来以组件的形式装载数据，把django.vue中的请求删掉，并改名为UserList.vue，修改路由名称
+	5>修改App.vue中的标签内容
+		<div class="menu">
+          <div v-for="item in menuList" :key="item.id" class="item">
+            <div
+              v-if="item.id == choosed"
+              style="background: #777777; color: #ffffff"
+            >
+              <router-link to="/" style="color: #fff">{{
+                item.text
+              }}</router-link>
+            </div>
+            <div v-else style="" @click="chooseMenu(item.id)">
+              <router-link to="/" style="color: #000">{{
+                item.text
+              }}</router-link>
+            </div>
+          </div>
+        </div>
+### 38.vue-router路由传参
+	1>通过点击修改文本信息
+		<div class="userlist">
+          <p>{{choosed_text}}</p>
+          <hr />
+          <router-view />
+        </div>
+		data() {
+			return {
+			  choosed: 1,
+			  choosed_text:'Django后端',
+			  menuList: [],
+			};
+	    },
+		chooseMenu(id) {
+		  console.log(id);
+		  this.choosed = id;
+		  for (let index = 0; index < this.menuList.length; index++) {
+			if (id==this.menuList[index].id) {
+			  this.choosed_text=this.menuList[index].text
+			}
+			
+		  }
+		},
+	2>进行id传参，路由跳转
+		在App.vue的getchooseMenu方法内写入 this.$router.push({path:'/',query:{menuId:id}})   //进行id传参跳转
+		在UserList.vue里添加监听
+		<script>
+		import axios from 'axios'
+		export default {
+			data() {
+				return{
+					apiurl:'http://127.0.0.1:9000/',
+					imglist:[],
+					menuId:1
+				}
+			},
+			mounted(){
+				this.getUserList(this.menuId)
+			},
+			watch:{
+				$route(to){
+					console.log(to.query.menuId)
+					this.menuId=to.query.menuId
+					this.getUserList(this.menuId)
+				}
+			},
+			methods:{
+				//从这里开始后端的请求
+				getUserList(id){
+					console.log("开始获取用户分类列表"+id)
+					axios({
+						url:'http://127.0.0.1:9000/get-user-list/',
+						type:'json',
+						params:{
+							id
+						},
+						method:'get'
+					}).then((res)=>{
+						console.log(res)
+						this.imglist=res.data
+					})
+				}
+			}
+		}
+		</script>
+		//可以看到每次点击都有两次路由跳转，是因为App.vue里的router-link默认执行了本地跳转，将其改为a标签即可
+	3>后端添加路由方法
+		path('get-user-list/', api.getUserList)
+		@api_view(['GET'])
+		def getUserList(request):
+			menuId = request.GET['id']  //拿到前端传过来的id参数
+			print(menuId)   //成功打印即可证明后端能收到前端传递的参数
+			menu = Classes.objects.get(id=menuId)
+			print(menu)
+			userlist = Userinfo.objects.filter(belong=menu)
+			print(userlist)
+			# 开始整理数据列表
+			data = []
+			for user in userlist:
+				data_item = {
+					'id':user.id,
+					'headImg':str(user.headImg),
+					'nickName':user.nickName
+				}
+				data.append(data_item)
+			return Response(data)
+	4>修改标签
+		<div id="userlist">
+			<div v-for="item in imglist" :key="item.pk" class="user">
+				<img :src="apiurl+'upload/'+item.headImg" alt="">
+				<p>{{item.nickName}}</p>
+			</div>
+		</div>

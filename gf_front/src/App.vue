@@ -1,6 +1,8 @@
 <template>
   <div id="home">
     <div>
+      <button>登录</button>
+      <button>注册</button>
       <div class="header">
         <h1>网页标题</h1>
         <img src="./assets/logo.png" alt="" />
@@ -33,14 +35,18 @@
       </div>
       <hr />
     </div>
-
+    <LoginBox></LoginBox>
     <div class="foot">Copyright gf</div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import LoginBox from "../src/components/LoginBox"
 export default {
+  components:{
+    LoginBox
+  },
   data() {
     return {
       choosed: 1,

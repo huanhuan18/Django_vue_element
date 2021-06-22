@@ -553,3 +553,66 @@
 				<p>{{item.nickName}}</p>
 			</div>
 		</div>
+### 40.执行一次POST请求
+	1>在App.Vue最上方加入两个button,然后为了美观在mystyle.css中的h1内加入margin-top: 0;
+	2>在components中新建LoginBox.vue，写入内容
+	3>在App.vue中引入import LoginBox from "../src/components/LoginBox"
+		export default {
+		  components:{
+			LoginBox
+		  },
+		}
+	4>应用标签<LoginBox></LoginBox>
+	5>在后端urls.py中写入path('login/', api.toLogin),然后在api.py中新建toLogin方法
+	6>在前端LoginBox.vue中导入axios   //导入Qs处理数据，否则数据格式会有问题  import Qs from "qs"   Qs.stringify()
+### 41.理解登录安全及流程
+	1>验证用户名是否存在：在前端LoginBox.vue中写入
+		if (username.length > 0 && password.length > 0) {...}else{alert("用户名或密码不能为空")}
+	2>在后端api.py中的toLogin里写入
+		from django.contrib.auth.models import User
+		//查询用户数据库
+		user = User.object.filter(username=username)
+		if len(user) > 0:
+			print(user)
+		else:
+			return Response('none')
+		return Response('ok')
+	3>在前端LoginBox.vue中写入if (res.data=='none') {alert('用户名不存在')}
+	4>验证密码是否存在：在后端api.py中写入from django.contrib.auth.hashers import check_password 
+		if len(user) > 0:
+			user_pwd = user[0].password
+			auth_pwd = check_password(password,user_pwd)
+			//django里面的密码都是通过哈希算法加密的，这里将传入的密码字符串转为哈希值跟原密码对比
+			print(auth_pwd)
+			if auth_pwd:
+				return Response('ok')
+			else:
+				return Response('pwderr')
+	5>在前端LoginBox.vue中写入
+		switch (res.data) {
+            case "none":
+              alert("用户名不存在");
+              break;
+            case "pwderr":
+              alert("密码错误");
+              break;
+            default:
+              alert("登录成功");
+              break;
+          }
+### 42.Django后端 Token分发   
+	//让用户保持登录状态，虽然Token也不安全，但是可以给它设置过期时间
+	1>在django的settings.py下的INSTALLED_APP中加入'rest_framework.authtoken',然后合并数据库python manage.py makemigrations,python manage.py migrate
+	2>在api.py中导入from rest_framework.authtoken.models import Token
+		    if auth_pwd:
+				token = Token.objects.update_or_create(user=user[0])
+				token = Token.objects.get(user=user[0])
+				print(token.key)
+				data = {
+					'token':token.key
+				}
+				return Response(data)
+	3>在前端LoginBox.vue中写入
+			default:
+                console.log(res.data.token)
+				break;

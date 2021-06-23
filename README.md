@@ -616,3 +616,39 @@
 			default:
                 console.log(res.data.token)
 				break;
+### 43.vueCli父向子组件通信
+	1>在父组件app.vue中登录按钮加入判断
+		data() {return {boxtarget:0}}
+		<button @click="showLoginRegisterBox(1)">登录</button>
+		<button @click="showLoginRegisterBox(2)">注册</button>
+		<LoginBox v-if="boxtarget" :target="boxtarget" @hideBox="hideLoginRegisterBox"></LoginBox>
+		
+		//展示登录注册框体
+		showLoginRegisterBox(value) {
+		  this.boxtarget=value
+		},
+		//隐藏登录注册框体
+		hideLoginRegisterBox() {
+		  this.boxtarget=0
+		}
+	2>在子组件LoginBox.vue中加入
+		<!-- click.self表示只影响自身标签，不会影响下面的子标签 -->
+		<div id="login" @click.self="hideSelf">
+		<div v-if="target == 2" class="item">
+          <div class="span">重复密码：</div>
+          <input v-model="password2" type="text" placeholder="再次输入密码" />
+        </div>
+		<button v-if="target == 1" @click="toLogin">登录</button>
+        <button v-if="target == 2" @click="toRegister">注册</button>
+		
+		data() {return {password2: "",};},
+		props:['target'],
+		mounted() {
+		  console.log(this.target)
+		},
+		methods: {
+			hideSelf() {
+			  this.$emit("hideBox");
+			}，
+			toRegister() {},
+		}

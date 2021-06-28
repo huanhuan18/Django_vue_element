@@ -43,7 +43,41 @@ export default {
       this.$emit("hideBox");
     },
     //注册
-    toRegister() {},
+    toRegister() {
+      var username = this.username;
+      var password = this.password;
+      var password2 = this.password2;
+      console.log(username, password, password2);
+      if (username.length > 0 && password.length > 0 && password2.length > 0) {
+        if (password != password2) {
+          alert("密码两次输入不同");
+        } else {
+          axios({
+            url: "http://127.0.0.1:9000/register/",
+            data: Qs.stringify({
+              username,
+              password,
+              password2,
+            }),
+            method: "post",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }).then((res) => {
+            console.log(res);
+            switch (res.data) {
+                case 'same':
+                    alert('存在同名用户')
+                    break
+                default:
+                    break;
+            }
+          });
+        }
+      }else{
+          alert('缺少必填项')
+      }
+    },
     //登录
     toLogin() {
       console.log(this.username, this.password);

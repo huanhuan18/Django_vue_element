@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password,make_password
 from myblog.models import Classes, Userinfo
 from myblog.toJson import Classes_data, Userinfo_data
 
@@ -96,3 +96,20 @@ def toLogin(request):
     else:
         return Response('none')
     # return Response('ok')
+
+@api_view(['GET', 'POST'])
+def toRegister(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    password2 = request.POST['password2']
+    print(username, password, password2)
+    # 用户是否存在
+    user = User.objects.filter(username=username)
+    if user:
+        return Response('same')
+    else:
+        newPwd = make_password(password,username)
+        print(newPwd)
+        newUser = User(username=username, password=newPwd)
+        newUser.save()
+    return Response('ok')

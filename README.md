@@ -652,3 +652,56 @@
 			}，
 			toRegister() {},
 		}
+### 44.前端提交到Django用户注册
+	1>在LoginBox.vue中写入注册方法
+		toRegister() {
+		  var username = this.username;
+		  var password = this.password;
+		  var password2 = this.password2;
+		  console.log(username, password, password2);
+		  if (username.length > 0 && password.length > 0 && password2.length > 0) {
+			if (password != password2) {
+			  alert("密码两次输入不同");
+			} else {
+			  axios({
+				url: "http://127.0.0.1:9000/register/",
+				data: Qs.stringify({
+				  username,
+				  password,
+				  password2,
+				}),
+				method: "post",
+				headers: {
+				  "Content-Type": "application/x-www-form-urlencoded",
+				},
+			  }).then((res) => {
+				console.log(res);
+				switch (res.data) {
+					case 'same':
+						alert('存在同名用户')
+						break
+					default:
+						break;
+				}
+			  });
+			}
+		  }else{
+			  alert('缺少必填项')}},
+	2>在后端urls.py中加入路径path('register',api.toRegister)
+	3>在api.py中写入from django.contrib.auth.hashers import make_password
+		@api_view(['GET', 'POST'])
+		def toRegister(request):
+			username = request.POST['username']
+			password = request.POST['password']
+			password2 = request.POST['password2']
+			print(username, password, password2)
+			# 用户是否存在
+			user = User.objects.filter(username=username)
+			if user:
+				return Response('same')
+			else:
+				newPwd = make_password(password,username)
+				print(newPwd)
+				newUser = User(username=username, password=newPwd)
+				newUser.save()
+			return Response('ok')

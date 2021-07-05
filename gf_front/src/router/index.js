@@ -11,6 +11,11 @@ const routes = [
     component: () => import('../views/UserList.vue')
   },
   {
+    path: '/userinfo',
+    name: 'UserInfo',
+    component: () => import('../views/Userinfo.vue')
+  },
+  {
     path: '/vuecli',
     name: 'vueCli',
     component: () => import('../views/vuecli.vue')

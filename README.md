@@ -705,3 +705,211 @@
 				newUser = User(username=username, password=newPwd)
 				newUser.save()
 			return Response('ok')
+### 45.axios提交图片保存并返回预览
+	1>在前端App.vue中加入<button @click="showLoginRegisterBox(3)">修改</button>
+	2>在LoginBox.vue中加入
+		<div v-if="target == 3" class="item">
+          <div class="span">网站名称：</div>
+          <input v-model="sitename" type="text" placeholder="输入网站名称" />
+        </div>
+        <div v-if="target == 3" class="item">
+          <div class="span">图片上传</div>
+          <input id="uploadLogo" @change="uploadImg($event)" type="file" style="width:70px"/>
+        </div>
+		<button v-if="target == 3" @click="toUpload">确定</button>
+		
+		toUpload(){
+		  var sitename = this.sitename;
+		  var logo = this.testlogo;
+		  // var logo = document.getElementById("uploadLogo")
+		  console.log(sitename);
+		  if (sitename.length > 0 && logo.length > 0) {
+			axios({
+			  url: "http://127.0.0.1:9000/upload-logo/",
+			  method: "put",
+			  headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			  },
+			  data: Qs.stringify({
+				sitename,
+				logo,
+			  }),
+			}).then((res) => {
+			  console.log(res);
+			  if (res.data == 'ok') {
+				  window.location.reload()  //刷新页面
+			  }
+			});
+		  }else{
+			  alert("没有新的标题或者图片")
+		  }
+		},
+		uploadImg(e){
+			var logo = e.target.files[0]
+			console.log(logo)
+			var Img = new FormData()
+			Img.append('logo', logo)
+			axios({
+				url:"http://127.0.0.1:9000/upload-logo/",
+				method:'post',
+				headers: {
+				  "Content-Type": "application/x-www-form-urlencoded",
+				},
+				data: Img,
+			}).then((res)=>{
+				console.log(res)
+				if (res.data) {
+				  this.testlogo = "http://127.0.0.1:9000/upload/" + res.data.img;
+				}
+			})
+		},
+	3>在后端urls.py中加入path('upload-logo/', api.uploadLogo)
+	  api.py中加入from myblog.models import Siteinfo
+	  @api_view(['POST', 'PUT'])
+	  def uploadLogo(request):
+		if request.method == 'PUT':
+			sitename = request.POST['sitename']
+			print(sitename)
+			old_info = Siteinfo.objects.get(id=1)
+			old_info.title = sitename
+			new_info = Siteinfo.objects.get(id=2)
+			old_info.logo = new_info.logo
+			old_info.save()
+			return Response('ok')
+		img = request.FILES['logo']
+		print(img)
+		test_sitelogo = Siteinfo.objects.get(id=2)
+		test_sitelogo.logo = img
+		test_sitelogo.save()
+		data = {
+			'img':str(test_sitelogo.logo)
+		}
+		return Response(data)
+	4>在api.py中加入
+		def getMenuList(request):
+			siteinfo = Siteinfo.objects.get(id=1)
+			siteinfo_data = {
+				'sitename':siteinfo.title,
+				'logo':'127.0.0.1:9000/upload/' + str(siteinfo.logo)
+			}
+	5>在App.vue中修改
+		<h1>{{siteinfo.sitename}}</h1>
+        <img :src="siteinfo.logo" alt="" />
+		getMenuList() {this.menuList = res.data.menu_data;this.siteinfo = res.data.siteinfo;}
+### 46.JS操作浏览器缓存与数据删除
+	1>//权限判定
+	  在LoginBox.vue中的toLogin内加入token
+		window.localStorage.setItem('token', res.data.token)
+	2>在App.vue中加入
+		<button v-if="loginType==false" @click="showLoginRegisterBox(1)">登录</button>
+        <button v-if="loginType==false" @click="showLoginRegisterBox(2)">注册</button>
+        <button v-if="loginType">个人中心</button>
+        <button v-if="loginType" @click="showLoginRegisterBox(3)">修改</button>
+		
+		loginType:false,
+		
+		try {
+		  if (window.localStorage.getItem('token').length>0) {
+		  this.loginType = true
+		}
+		} catch (error) {
+		  console.log(error)
+		}
+	3>//删除
+	  在UserList.vue中加入<button @click="deleteUser(item.id)">删除</button>
+	  import Qs from "qs";
+	  deleteUser(id){
+            axios({
+                url:'http://127.0.0.1:9000/get-user-list/',
+                type:'json',
+                data:Qs.stringify({
+                    id
+                }),
+                method:'delete',
+				headers: {
+				  "Content-Type": "application/x-www-form-urlencoded",
+				},
+            }).then((res)=>{
+                console.log(res)
+				if (res.data=='ok') {
+					this.getUserList(this.menuId)
+				}
+            })
+        }
+	4>在api.py中修改
+		@api_view(['GET', 'DELETE'])
+		def getUserList(request):
+			if request.method == 'DELETE':
+				user_id = request.POST['id']
+				print(user_id)
+				deleteUser = Userinfo.objects.get(id=user_id)
+				deleteUser.delete()
+				return Response('ok')
+### 47.为什么使用vuex
+	1>在model.py中加入from django.contrib.auth.models import User
+		class Userinfo(models.Model):
+			belong_user = models.OneToOneField(User, on_delete=models.CASCADE,null=True,blank=True)
+		然后执行数据表迁移
+	2>在api.py中的toLogin里加入
+		# 获取用户信息
+		userinfo = Userinfo.objects.get(belong_user=user[0])
+		data = {
+			'token':token.key,
+			'userinfo':{
+				'id':userinfo.id,
+				'nickname':userinfo.nickName,
+				'headImg':str(userinfo.headImg)
+			}
+		}
+### 48.vuex的初次使用
+	1>安装vuex插件,会多出store目录
+	2>在views目录下新建Userinfo.vue
+	3>在index.js下添加路由/userinfo
+	4>在App.vue中加入
+		<button v-if="loginType" @click="toHome">首页</button>
+        <button v-if="loginType" @click="toUserinfo">个人中心</button>
+		toHome(){
+		  this.$router.push({path:'/'})
+		},
+		toUserinfo(){
+		  this.$router.push({path:'/userinfo'})
+		},
+	5>在store下的index.js中写入
+		//state可以理解为data,它的状态会保存在所有组件的上层
+		  state: {
+			userinfo:{}
+		  },
+		  mutations: {
+			editUserinfo(state, user){
+			  state.userinfo = user
+			  console.log(state)
+			}
+		  },
+	6>在LoginBox.vue下的toLogin中加入
+		//开始存储vuex中的用户信息
+		  var userinfo = res.data.userinfo
+		  console.log(userinfo)
+		  this.$store.commit('editUserinfo',userinfo)
+		  if (this.$route.path != "/userinfo") {
+			  this.$router.push({path:'/userinfo'})
+		  }
+	7>在Userinfo.vue中写入
+		<img :src="'http://127.0.0.1:9000/upload/'+userinfo.headImg" alt="" />
+		<div>{{userinfo.nickname}}</div>
+		
+		data() {
+			return {
+				userinfo:{}
+			}
+		},
+		mounted() {
+			this.getUserinfo()
+		},
+		methods: {
+			getUserinfo() {
+				console.log('开始获取用户信息')
+				this.userinfo = this.$store.state.userinfo
+				console.log("$$$$$",this.userinfo)
+			}
+		}
+	8>tips:console打印对象时，字符串和对象要以  ,  间隔，不能直接写+号，否则会显示[object Object]

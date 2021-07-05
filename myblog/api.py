@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password,make_password
-from myblog.models import Classes, Userinfo
+from myblog.models import Classes, Userinfo, Siteinfo
 from myblog.toJson import Classes_data, Userinfo_data
 
 @api_view(['GET', 'POST'])
@@ -41,20 +41,35 @@ def api_test(request):
 @api_view(['GET'])
 def getMenuList(request):
     allClasses = Classes.objects.all()
+    siteinfo = Siteinfo.objects.get(id=1)
+    siteinfo_data = {
+        'sitename':siteinfo.title,
+        'logo':'http://127.0.0.1:9000/upload/' + str(siteinfo.logo)
+    }
 
     # 整理数据为json
-    data = []
+    menu_data = []
     for c in allClasses:
         # 设计单挑数据结构
         data_item = {
             'id':c.id,
             'text':c.text
         }
-        data.append(data_item)
+        menu_data.append(data_item)
+    data = {
+        'menu_data':menu_data,
+        'siteinfo':siteinfo_data
+    }
     return Response(data)
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 def getUserList(request):
+    if request.method == 'DELETE':
+        user_id = request.POST['id']
+        print(user_id)
+        deleteUser = Userinfo.objects.get(id=user_id)
+        deleteUser.delete()
+        return Response('ok')
     menuId = request.GET['id']
     print(menuId)
     menu = Classes.objects.get(id=menuId)
@@ -87,8 +102,16 @@ def toLogin(request):
             token = Token.objects.update_or_create(user=user[0])
             token = Token.objects.get(user=user[0])
             print(token.key)
+
+            # 获取用户信息
+            userinfo = Userinfo.objects.get(belong_user=user[0])
             data = {
-                'token':token.key
+                'token':token.key,
+                'userinfo':{
+                    'id':userinfo.id,
+                    'nickname':userinfo.nickName,
+                    'headImg':str(userinfo.headImg)
+                }
             }
             return Response(data)
         else:
@@ -113,3 +136,24 @@ def toRegister(request):
         newUser = User(username=username, password=newPwd)
         newUser.save()
     return Response('ok')
+
+@api_view(['POST', 'PUT'])
+def uploadLogo(request):
+    if request.method == 'PUT':
+        sitename = request.POST['sitename']
+        print(sitename)
+        old_info = Siteinfo.objects.get(id=1)
+        old_info.title = sitename
+        new_info = Siteinfo.objects.get(id=2)
+        old_info.logo = new_info.logo
+        old_info.save()
+        return Response('ok')
+    img = request.FILES['logo']
+    print(img)
+    test_sitelogo = Siteinfo.objects.get(id=2)
+    test_sitelogo.logo = img
+    test_sitelogo.save()
+    data = {
+        'img':str(test_sitelogo.logo)
+    }
+    return Response(data)

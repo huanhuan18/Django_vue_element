@@ -32,6 +32,8 @@ urlpatterns = [
     # 用户登录
     path('login/', api.toLogin),
     # 用户注册
-    path('register/',api.toRegister)
+    path('register/',api.toRegister),
+    # logo上传
+    path('upload-logo/', api.uploadLogo)
 ] + static(settings.STATIC_URL,document_root=settings.STATIC_ROOT) \
         + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

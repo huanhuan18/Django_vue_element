@@ -913,3 +913,32 @@
 			}
 		}
 	8>tips:console打印对象时，字符串和对象要以  ,  间隔，不能直接写+号，否则会显示[object Object]
+### 49.子向父组件传值
+	1>在App.vue中给子组件绑定
+		<router-view @hideBox="hideLoginRegisterBox" @changeUI="changeLoginType"/>
+		
+		changeLoginType(bool) {
+		  this.loginType = bool
+		}
+	2>在Userinfo.vue中加入
+		changePageUI() {
+            this.$emit('changeUI', true)
+            this.$emit('hideBox')
+        }
+### 50.子组件向子组件传值
+	第一种方法：子组件先向父组件传值，然后再通过父组件向另一个子组件传值
+	第二种方法：
+	1>在main.js中创建一个事件总线export const eventBus = new Vue();
+	2>在子组件Userinfo.vue中写入
+		import { eventBus } from '../main.js';
+		changeAllNickname() {
+			eventBus.$emit('changeTestName', nickName)   //第一个参数是传入的事件，第二个是传入的值
+		}
+	3>在另一子组件Test.vue中写入
+		import { eventBus } from '../main.js';
+		mounted() {
+			eventBus.$on('changeTestName', (data)=>{     //监听传过来的changeTestName事件，data就是传过来的值，可以直接使用了
+				console.log(data)
+			})
+		}
+		

@@ -33,7 +33,7 @@
         <div class="userlist">
           <p>{{choosed_text}}</p>
           <hr />
-          <router-view />
+          <router-view @hideBox="hideLoginRegisterBox" @changeUI="changeLoginType"/>
         </div>
       </div>
       <hr />
@@ -110,6 +110,10 @@ export default {
     hideLoginRegisterBox() {
       this.boxtarget=0
     },
+    //修改登录状态
+    changeLoginType(bool) {
+      this.loginType = bool
+    }
   },
 };
 </script>

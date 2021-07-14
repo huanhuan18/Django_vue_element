@@ -16,12 +16,17 @@ export default {
     },
     mounted() {
         this.getUserinfo()
+        this.changePageUI()
     },
     methods: {
         getUserinfo() {
             console.log('开始获取用户信息')
             this.userinfo = this.$store.state.userinfo
             console.log("$$$$$",this.userinfo)
+        },
+        changePageUI() {
+            this.$emit('changeUI', true)
+            this.$emit('hideBox')
         }
     }
 };

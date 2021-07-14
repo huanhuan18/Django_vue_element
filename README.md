@@ -3,11 +3,11 @@
 ### 2.进入虚拟环境中cd Script -->activate.bat
 ### 3.安装Django  pip install django
 ### 4.新建项目 django-admin startproject xxx(mysite)
-###5.新建app python manage.py startapp xxx(myblog)
+### 5.新建app python manage.py startapp xxx(myblog)
 ### 6.数据库迁移 
     python manage.py makemigrations //具体在某个应用下更新可在后面加上app名称,如myblog
     python manage.py migrate
-### 7.运行Django python manage.py 
+### 7.运行Django python manage.py runserver
 ### 8.settings配置：
 	1>将新建的app添加到mysite.settings中的INSTALLED_APPS列表中(ALLOWED_HOSTS表示允许的其他ip访问)
 	2>MIDDLEWARE: 中间件，包括csrf跨站、登录验证等，刚开始并不用动
